@@ -1,0 +1,255 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.jt.lumibright;
+
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.KeyEvent;
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
+import javax.swing.JComponent;
+import static javax.swing.JComponent.WHEN_IN_FOCUSED_WINDOW;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.KeyStroke;
+
+/**
+ *
+ * @author superman
+ */
+public class Frame extends javax.swing.JFrame {
+
+    private LineDownPanel lineDownPanel;
+    private EditingPanel editingPanel;
+    private LegendPanel legendPanel;
+    private boolean editing;
+    private State state;
+
+    /**
+     * Creates new form Frame
+     */
+    public Frame(State state) {
+        initComponents();
+        this.state = state;
+        
+        setVisible(true);
+        lineDownPanel = new LineDownPanel();
+        lineDownPanel.setSize(getSize());
+        getLayeredPane().add(lineDownPanel, new Integer(1));
+
+        editingPanel = new EditingPanel();
+        editingPanel.setSize(getSize());
+        editingPanel.setVisible(false);
+        getLayeredPane().add(editingPanel, new Integer(2));
+
+        legendPanel = new LegendPanel();
+        legendPanel.setSize(getSize());
+        legendPanel.setVisible(true);
+        getLayeredPane().add(legendPanel, new Integer(3));
+
+        setFocusable(true);
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                lineDownPanel.setSize(e.getComponent().getSize());
+                lineDownPanel.setVisible(false);
+                lineDownPanel.setVisible(true);
+                editingPanel.setSize(e.getComponent().getSize());
+                legendPanel.setSize(e.getComponent().getSize());
+                legendPanel.setVisible(false);
+                legendPanel.setVisible(true);
+            }
+        });
+
+        setupInputMap();
+        editing = false;
+    }
+
+    public void setupFontSize(int lineDownSize, int partSize, int modeSize, int timerSize, int legendSize, int editingSize) {
+        System.out.println(String.format("setting line down text size to %s...", lineDownSize));
+        setComponentFontSize(lineDownPanel.getLblLineDown(), lineDownSize);
+        System.out.println(String.format("setting part text size to %s...", lineDownSize));
+        setComponentFontSize(lineDownPanel.getLblPart(), partSize);
+        System.out.println(String.format("setting mode text size to %s...", lineDownSize));
+        setComponentFontSize(lineDownPanel.getLblMode(), modeSize);
+        System.out.println(String.format("setting timer text size to %s...", timerSize));
+        setComponentFontSize(lineDownPanel.getLblTimer(), timerSize);
+        System.out.println(String.format("setting legend text size to %s...", legendSize));
+        setComponentFontSize(legendPanel.getLblLegend(), legendSize);
+        System.out.println(String.format("setting editing part text size to %s...", editingSize));
+        setComponentFontSize(editingPanel.getTxtPart(), modeSize);
+        System.out.println(String.format("setting editing mode text size to %s...", editingSize));
+        setComponentFontSize(editingPanel.getTxtMode(), modeSize);
+    }
+
+    private void setupInputMap() {
+        System.out.println("setting input map...");
+        JPanel contentPane = (JPanel) getContentPane();
+        InputMap im = contentPane.getInputMap(WHEN_IN_FOCUSED_WINDOW);
+        ActionMap am = contentPane.getActionMap();
+
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0), "F2");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_F9, 0), "F9");
+        am.put("F2", new EditAction(this));
+        am.put("F9", new SaveAction(this));
+    }
+
+    private void setComponentFontSize(JComponent component, float size) {
+        Font newFont = component.getFont().deriveFont(size);
+        component.setFont(newFont);
+    }
+
+    public void lineDown() {
+        lineDownPanel.startTimer();
+        lineDownPanel.changeLineDownToRed();
+    }
+
+    public void stopTimer() {
+        lineDownPanel.stopTimer();
+    }
+
+    public void resetTimer() {
+        lineDownPanel.resetTimer();
+        lineDownPanel.changeLineDownToWhite();
+    }
+    
+    public void setPart(String part) {
+        lineDownPanel.getLblPart().setText(part);
+    }
+    
+    public void setMode(String mode) {
+        lineDownPanel.getLblMode().setText(mode);
+    }
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 400, Short.MAX_VALUE)
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 300, Short.MAX_VALUE)
+        );
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(Frame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(Frame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(Frame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(Frame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                Frame frame = new Frame(null);
+            }
+        });
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    // End of variables declaration//GEN-END:variables
+    private class EditAction extends AbstractAction {
+
+        private Frame frame;
+
+        public EditAction(Frame frame) {
+            this.frame = frame;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (!frame.editing) {
+                System.out.println("editing...");
+
+                String part = frame.lineDownPanel.getLblPart().getText();
+                String mode = frame.lineDownPanel.getLblMode().getText();
+
+                frame.editingPanel.getTxtPart().setText(part);
+                frame.editingPanel.getTxtMode().setText(mode);
+
+                frame.editingPanel.setVisible(true);
+                frame.editingPanel.getTxtPart().requestFocus();
+
+                frame.editing = true;
+            } else {
+                System.out.println("key ignored...");
+            }
+        }
+
+    }
+
+    private class SaveAction extends AbstractAction {
+
+        private Frame frame;
+
+        public SaveAction(Frame frame) {
+            this.frame = frame;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (frame.editing) {
+                System.out.println("saving...");
+
+                String part = frame.editingPanel.getTxtPart().getText();
+                String mode = frame.editingPanel.getTxtMode().getText();
+
+                frame.lineDownPanel.getLblPart().setText(part);
+                frame.lineDownPanel.getLblMode().setText(mode);
+
+                frame.editingPanel.setVisible(false);
+                frame.requestFocus();
+
+                frame.editing = false;
+                
+                state.part = part;
+                state.mode = mode;
+                state.save();
+            } else {
+                System.out.println("key ignored...");
+            }
+        }
+
+    }
+}
