@@ -8,9 +8,9 @@ package com.jt.lumibright;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.text.DecimalFormat;
-import javax.swing.JLabel;
-import javax.swing.Timer;
+import javax.swing.*;
 
 /**
  *
@@ -18,8 +18,10 @@ import javax.swing.Timer;
  */
 public class LineDownPanel extends javax.swing.JPanel {
 
-    private Timer timer;
+    private Timer textTimer;
+    private Timer blinkingTimer;
     private CountTimerAction timerAction;
+    private BlinkingTimerAction blinkingTimerAction;
 
     /**
      * Creates new form LineDownPanel
@@ -27,7 +29,10 @@ public class LineDownPanel extends javax.swing.JPanel {
     public LineDownPanel() {
         initComponents();
         timerAction = new CountTimerAction(lblTimer);
-        timer = new Timer(1000, timerAction);
+        blinkingTimerAction = new BlinkingTimerAction(linePanel);
+        
+        textTimer = new Timer(1000, timerAction);
+        blinkingTimer = new Timer(300, blinkingTimerAction);
     }
 
     /**
@@ -49,13 +54,13 @@ public class LineDownPanel extends javax.swing.JPanel {
         timerPanel = new javax.swing.JPanel();
         lblTimer = new javax.swing.JLabel();
 
-        linePanel.setBackground(new java.awt.Color(255, 255, 255));
+        linePanel.setBackground(Color.GREEN);
         linePanel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         linePanel.setFocusable(false);
 
         lblLineDown.setFont(new java.awt.Font("Tahoma", 1, 48)); // NOI18N
         lblLineDown.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblLineDown.setText("Line Down !");
+        lblLineDown.setText("Normal");
         lblLineDown.setFocusable(false);
 
         javax.swing.GroupLayout linePanelLayout = new javax.swing.GroupLayout(linePanel);
@@ -193,24 +198,22 @@ public class LineDownPanel extends javax.swing.JPanel {
     }
 
     public void startTimer() {
-        timer.start();
+        lblLineDown.setText("Line Down!");
+        textTimer.start();
+        blinkingTimer.start();
     }
 
     public void stopTimer() {
-        timer.stop();
-    }
-
-    public void changeLineDownToRed() {
-        linePanel.setBackground(Color.red);
-    }
-
-    public void changeLineDownToWhite() {
-        linePanel.setBackground(Color.white);
+        textTimer.stop();
+        blinkingTimer.stop();
+        linePanel.setBackground(Color.RED);
     }
 
     public void resetTimer() {
         timerAction.resetTimer();
         lblTimer.setText("00:00:00");
+        lblLineDown.setText("Normal");
+        linePanel.setBackground(Color.GREEN);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -256,4 +259,68 @@ public class LineDownPanel extends javax.swing.JPanel {
         }
 
     }
+
+    private static class BlinkingTimerAction implements ActionListener {
+
+        private javax.swing.JPanel panel;
+        private int current = 0;
+
+        public BlinkingTimerAction(javax.swing.JPanel panel) {
+            this.panel = panel;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (current == 0) {
+                panel.setBackground(Color.RED);
+                current = 1;
+            } else {
+                panel.setBackground(Color.WHITE);
+                current = 0;
+            }
+        }
+    }
+
+    // <editor-fold defaultstate="collapsed" desc="Main method">//GEN-BEGIN:main
+    public static void main(String[] args) {
+        JFrame f = new JFrame("Panel Example");
+        f.setDefaultCloseOperation(2);
+
+        final LineDownPanel panel = new LineDownPanel();
+        InputMap im = panel.getInputMap(WHEN_IN_FOCUSED_WINDOW);
+        ActionMap am = panel.getActionMap();
+
+        AbstractAction startAction = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                panel.startTimer();
+            }
+        };
+
+        AbstractAction stopAction = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                panel.stopTimer();
+            }
+        };
+
+        AbstractAction resetAction = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                panel.resetTimer();
+            }
+        };
+
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0), "F2");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_F3, 0), "F3");
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_F4, 0), "F4");
+        am.put("F2", startAction);
+        am.put("F3", stopAction);
+        am.put("F4", resetAction);
+
+        f.add(panel);
+        f.pack();
+        f.setVisible(true);
+    }// </editor-fold>//GEN-END:main
+
 }

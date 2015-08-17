@@ -107,7 +107,6 @@ public class Frame extends javax.swing.JFrame {
 
     public void lineDown() {
         lineDownPanel.startTimer();
-        lineDownPanel.changeLineDownToRed();
     }
 
     public void stopTimer() {
@@ -116,7 +115,6 @@ public class Frame extends javax.swing.JFrame {
 
     public void resetTimer() {
         lineDownPanel.resetTimer();
-        lineDownPanel.changeLineDownToWhite();
     }
     
     public void setPart(String part) {
