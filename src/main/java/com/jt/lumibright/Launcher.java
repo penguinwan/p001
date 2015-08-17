@@ -67,27 +67,35 @@ public class Launcher {
                 Controller controller = new Controller(frame);
 
                 try {
-                    System.out.println("setting up gpio factory...");
-                    GpioController gpio = GpioFactory.getInstance();
+                    boolean disableGpio = false;
+                    String skipGpio = System.getProperty("skipGpio");
+                    if (skipGpio != null && skipGpio.equalsIgnoreCase("true")) {
+                        disableGpio = true;
+                    }
 
-                    // line down pin 04
-                    System.out.println(String.format("line down pin to %s...", config.lineDownPin));
-                    final GpioPinDigitalInput lineDownPin = gpio.provisionDigitalInputPin(
-                            RaspiPin.getPinByName(
-                                    config.lineDownPin),
-                            PinPullResistance.PULL_DOWN);
-                    lineDownPin.setDebounce(config.debounceIntervalMilisecond);
-                    lineDownPin.addListener(new LineDownGpioListener(controller));
+                    if (!disableGpio) {
+                        System.out.println("setting up gpio factory...");
+                        GpioController gpio = GpioFactory.getInstance();
 
-                    // reset timer pin 05
-                    System.out.println(String.format("reset timer pin to %s...", config.resetPin));
-                    final GpioPinDigitalInput resetPin = gpio.provisionDigitalInputPin(
-                            RaspiPin.getPinByName(
-                                    config.resetPin),
-                            PinPullResistance.PULL_DOWN);
-                    resetPin.setDebounce(config.debounceIntervalMilisecond);
-                    resetPin.addListener(new ResetTimerGpioListener(controller));
-                    
+                        // line down pin 04
+                        System.out.println(String.format("line down pin to %s...", config.lineDownPin));
+                        final GpioPinDigitalInput lineDownPin = gpio.provisionDigitalInputPin(
+                                RaspiPin.getPinByName(
+                                        config.lineDownPin),
+                                PinPullResistance.PULL_DOWN);
+                        lineDownPin.setDebounce(config.debounceIntervalMilisecond);
+                        lineDownPin.addListener(new LineDownGpioListener(controller));
+
+                        // reset timer pin 05
+                        System.out.println(String.format("reset timer pin to %s...", config.resetPin));
+                        final GpioPinDigitalInput resetPin = gpio.provisionDigitalInputPin(
+                                RaspiPin.getPinByName(
+                                        config.resetPin),
+                                PinPullResistance.PULL_DOWN);
+                        resetPin.setDebounce(config.debounceIntervalMilisecond);
+                        resetPin.addListener(new ResetTimerGpioListener(controller));
+                    }
+
                     System.out.println("frame is ready...");
                 } catch (Exception ex) {
                     System.out.println("Error setting up GPIO...");
